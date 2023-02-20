@@ -53,6 +53,11 @@ void MyServer::SNewConnection()
 void MyServer::SReadClient()
 {
     QTcpSocket* pClientSoket = m_ptcpServer->nextPendingConnection();
+    if (pClientSoket == nullptr)
+    {
+     // ничего не делаем и выходим из функции
+     return;
+    }
     QDataStream in(pClientSoket);
 
     in.setVersion(QDataStream::Qt_5_3);
@@ -83,6 +88,8 @@ void MyServer::SReadClient()
 
         m_nNextBlockSize = 0;
 
+        //pClientSoket->
+
         sendToClient(pClientSoket,"Server Response: Received \"" + str + "\"");
 
     }
@@ -100,4 +107,5 @@ void MyServer::sendToClient(QTcpSocket *pSocet, const QString &str)
     out << quint16(arrBlock.size() - sizeof(quint16));
 
     pSocet->write(arrBlock);
+    pSocet->waitForBytesWritten(500);
 }
